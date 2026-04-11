@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web Map</title>
+  <title>PortalGeo</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/2.0.0-alpha/leaflet.css" />
@@ -52,18 +52,76 @@
       <div class="col-xs-12" style="height: 10px;"></div>
 
       <div class="col-xs-12">
-        <p class="text-center bold">Valve Information</p>
+        <p class="text-center bold">Informações da Válvula</p>
       </div>
       <div class="col-xs-12 errorMsg" id="valve_error"></div>
       <div class="col-xs-12" style="height: 10px;"></div>
 
       <div class="form-group">
         <div class="col-xs-6">
-          <input type="text" id="valve_error" class="form-control" placeholder="Valve ID">
+          <input type="text" id="valve_id" class="form-control" placeholder="Valve ID">
         </div>
         <div class="col-xs-6">
-          <button id="findValve" class="btn btn-primary">Buscar Válvula</button>        
+          <button id="findValve" class="btn btn-primary">Buscar Válvula</button>
         </div>
+      </div>
+
+      <div class="col-xs-12" id="valve_information">
+
+      </div>
+
+    </div>
+
+    <div class="col-xs-12" style="height: 50px;"></div>
+
+    <div id="divValve class=" col-xs-12">
+
+      <div class="col-xs-12" style="height: 10px;"></div>
+
+      <div class="col-xs-12">
+        <p class="text-center bold">Informações da Rede</p>
+      </div>
+      <div class="col-xs-12 errorMsg" id="pipeline_error"></div>
+      <div class="col-xs-12" style="height: 10px;"></div>
+
+      <div class="form-group">
+        <div class="col-xs-6">
+          <input type="text" id="pipeline_id" class="form-control" placeholder="Pipeline ID">
+        </div>
+        <div class="col-xs-6">
+          <button id="findPipeline" class="btn btn-primary">Buscar Tubo</button>
+        </div>
+      </div>
+
+      <div class="col-xs-12" id="pipeline_information">
+
+      </div>
+
+    </div>
+
+    <div class="col-xs-12" style="height: 50px;"></div>
+
+    <div id="divValve class=" col-xs-12">
+
+      <div class="col-xs-12" style="height: 10px;"></div>
+
+      <div class="col-xs-12">
+        <p class="text-center bold">Informações das Construções</p>
+      </div>
+      <div class="col-xs-12 errorMsg" id="building_error"></div>
+      <div class="col-xs-12" style="height: 10px;"></div>
+
+      <div class="form-group">
+        <div class="col-xs-6">
+          <input type="text" id="building_id" class="form-control" placeholder="Building ID">
+        </div>
+        <div class="col-xs-6">
+          <button id="findBuilding" class="btn btn-primary">Buscar Construção</button>
+        </div>
+      </div>
+
+      <div class="col-xs-12" id="building_information">
+
       </div>
 
     </div>
@@ -99,7 +157,7 @@
     var Esri_WorldTopoMap = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", { maxZoom: 23 },);
     var OpenTopoMap = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom: 23, },);
 
-    Esri_WorldTopoMap.addTo(mymap);
+    googleSat.addTo(mymap);
 
     //SIDEBAR
     var sidebar = L.control.sidebar("sidebar", { position: "left", });
@@ -226,35 +284,36 @@
       var att = json.properties;
       var color;
       var fillColor;
-      var fillOpacity = 0.5;
+      var fillOpacity = 0.7;
       switch (att.Situacao) {
         case 'Disponível ':
-          color = '#6082a8';
-          fillColor = '#6082a8';
+          color = '#000000';
+          fillColor = '#ffffbf';
           break;
         case 'Em Negociação':
-          color = '#a8606b';
-          fillColor = '#a8606b';
+          color = '#000000';
+          fillColor = '#fc8d59';
           break;
         case 'Vendido':
-          color = '#057d2f';
-          fillColor = '#057d2f';
+          color = '#000000';
+          fillColor = '#99d594';
           break;
         default:
-          color = '#b5b251';
+          color = '#000000';
           fillColor = '#b5b251';
           break;
       }
 
-      var style = {
-        fillColor: fillColor,
+      var styleL = {
         color: color,
+        fillColor: fillColor,
         weight: 1,
         opacity: 1,
-        fillOpacity: fillOpacity
+        fillOpacity: fillOpacity,
+        dashArray: '0'
       };
 
-      return { color: color, fillColor: fillColor, weight: 1, opacity: 1, fillOpacity: fillOpacity };
+      return styleL;
     }
 
     function process_lotes(json, layer) {
@@ -265,6 +324,27 @@
     }
 
     control_layers.addOverlay(lotes, "Lotes");
+
+    $("#findBuilding").click(function () {
+      var building_id = $("#building_id").val();
+      console.log(building_id);
+      returnLayerByAtribute(lotes, "Lote", building_id);
+    });
+
+    //GENERAL FUNCION TO FIND LAYER BY ATTRIBUTE
+    function returnLayerByAtribute(layer, attribute, value) {
+      var found = false;
+      layer.eachLayer(function (l) {
+        if (l.feature.properties[attribute] == value) {
+          mymap.setView(l.getBounds().getCenter(), 18);
+          l.openPopup();
+          found = true;
+        }
+      });
+      if (!found) {
+        alert("Valor não encontrado: " + value);
+      }
+    }
 
 
   </script>
