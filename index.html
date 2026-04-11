@@ -279,7 +279,7 @@
       var fillColor;
       var radius = 5;
       var fillOpacity = 1;
-      switch (att.STRING) {
+      switch (att.TEXTSTRING) {
         case '62':
           color = '#d35400';
           fillColor = '#d35400';
@@ -369,8 +369,8 @@
     //FUNÇÃO DE BUSCA DE LOTE
     $("#findBuilding").click(function () {
       var building_id = $("#building_id").val();
-      console.log(building_id);
-      returnLayerByAtribute(lotes,"lote_id", building_id);
+      console.log(building_id.toUpperCase());
+      returnLayerByAtribute(lotes,"lote_id", building_id.toUpperCase());
     });
 
     //EQUIPAMENTOS
