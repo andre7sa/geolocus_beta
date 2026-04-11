@@ -148,10 +148,10 @@
 
       <div class="form-group">
         <div class="col-xs-6">
-          <input type="text" id="building_id" class="form-control" placeholder="Building ID">
+          <input type="text" id="building_id" class="form-control" placeholder="Lote">
         </div>
         <div class="col-xs-6">
-          <button id="findBuilding" class="btn btn-primary">Buscar Construção</button>
+          <button id="findBuilding" class="btn btn-primary">Buscar Lote</button>
         </div>
       </div>
 
@@ -357,7 +357,7 @@
         "<br><b>Situação: </b>" + att.Situacao + "<br><b>Área: </b>" + att.Area + "<br><b>Perímetro: </b>" + att.Perimetro;
       layer.bindPopup(popupContent);
       layer.on({
-        mouseover: highlightFeature,  
+        mouseover: highlightFeature,
         mouseout: resetHighlight,
         click: zoomToFeature
       });
@@ -370,6 +370,40 @@
       console.log(building_id);
       returnLayerByAtribute(lotes, "Lote", building_id);
     });
+
+    //EQUIPAMENTOS
+    var equipamentos = L.geoJson.ajax("data/GeoJSON/Equipamentos_Publicos.geojson", { style: style_equipamentos }).addTo(mymap);
+
+    function style_equipamentos(json) {
+      var style = {
+        color: "black",
+        fillColor: "green",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.7,
+        dashArray: '0'
+      };
+      return style;
+    }
+
+    control_layers.addOverlay(equipamentos, "Equipamentos");
+
+    //RUAS
+    var ruas = L.geoJson.ajax("data/GeoJSON/Ruas.geojson", { style: style_ruas }).addTo(mymap);
+
+    function style_ruas(json) {
+      var style = {
+        color: "black",
+        fillColor: "gray",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8,
+        dashArray: '0'
+      };
+      return style;
+    }
+
+    control_layers.addOverlay(ruas, "Ruas");
 
     //GENERAL FUNCION TO FIND LAYER BY ATTRIBUTE
     function returnLayerByAtribute(layer, attribute, value) {
@@ -391,7 +425,7 @@
 
       layer.setStyle({
         weight: 6,
-        color: '#353535',
+        color: '#303030',
         dashArray: '',
         fillOpacity: 0.7
       });
