@@ -148,7 +148,8 @@
 
       <div class="form-group">
         <div class="col-xs-6">
-          <input type="text" id="building_id" class="form-control" placeholder="Lote">
+          <input type="text" id="building_id" class="form-control" placeholder="01A">
+          <p class="text-muted" style="font-size: 12px;"><em>Exp.: 01A (Lote 01, Quadra A)</em></p>
         </div>
         <div class="col-xs-6">
           <button id="findBuilding" class="btn btn-primary">Buscar Lote</button>
@@ -365,10 +366,11 @@
 
     control_layers.addOverlay(lotes, "Lotes");
 
+    //FUNÇÃO DE BUSCA DE LOTE
     $("#findBuilding").click(function () {
       var building_id = $("#building_id").val();
       console.log(building_id);
-      returnLayerByAtribute(lotes, "Lote", building_id);
+      returnLayerByAtribute(lotes, "buscador", building_id);
     });
 
     //EQUIPAMENTOS
