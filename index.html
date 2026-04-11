@@ -42,6 +42,41 @@
     }
   </style>
 
+  <style>
+    #map {
+      width: 800px;
+      height: 500px;
+    }
+
+    .info {
+      padding: 6px 8px;
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+    }
+
+    .info h4 {
+      margin: 0 0 5px;
+      color: #777;
+    }
+
+    .legend {
+      text-align: left;
+      line-height: 18px;
+      color: #555;
+    }
+
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -321,6 +356,11 @@
       var popupContent = "<b>Quadra: </b>" + att.Quadra + "<br><b>Lote: </b>" + att.Lote +
         "<br><b>Situação: </b>" + att.Situacao + "<br><b>Área: </b>" + att.Area + "<br><b>Perímetro: </b>" + att.Perimetro;
       layer.bindPopup(popupContent);
+      layer.on({
+        mouseover: highlightFeature,  
+        mouseout: resetHighlight,
+        click: zoomToFeature
+      });
     }
 
     control_layers.addOverlay(lotes, "Lotes");
@@ -345,7 +385,27 @@
         alert("Valor não encontrado: " + value);
       }
     }
+    //FUNÇÕES DE INTERAÇÃO COM OS LOTES
+    function highlightFeature(e) {
+      var layer = e.target;
 
+      layer.setStyle({
+        weight: 6,
+        color: '#353535',
+        dashArray: '',
+        fillOpacity: 0.7
+      });
+
+      layer.bringToFront();
+    }
+
+    function resetHighlight(e) {
+      lotes.resetStyle(e.target);
+    }
+
+    function zoomToFeature(e) {
+      mymap.fitBounds(e.target.getBounds());
+    }
 
   </script>
 </body>
