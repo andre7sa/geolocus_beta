@@ -75,6 +75,26 @@
       margin-right: 8px;
       opacity: 0.7;
     }
+
+    .lote-marker-container {
+      background: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .lote-label-marker {
+      font-weight: bold;
+      font-size: 13px;
+      color: #000;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8), 
+                   -1px -1px 2px rgba(255, 255, 255, 0.8),
+                   1px -1px 2px rgba(255, 255, 255, 0.8),
+                   -1px 1px 2px rgba(255, 255, 255, 0.8);
+      position: absolute;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      pointer-events: none;
+    }
   </style>
 
 </head>
@@ -313,6 +333,9 @@
     control_layers.addOverlay(nos, "Nós");
 
     //LOTES
+    
+    var lotesLabelsGroup = L.layerGroup(); // Cria um grupo para os rótulos
+    var minZoomForLoteLabels = 19; // Zoom mínimo para exibir rótulos
 
     var lotes = L.geoJson.ajax("data/GeoJSON/Lotes.geojson", { style: style_lotes, onEachFeature: process_lotes }).addTo(mymap);
 
@@ -357,6 +380,21 @@
       var popupContent = "<b>Quadra: </b>" + att.Quadra + "<br><b>Lote: </b>" + att.Lote +
         "<br><b>Situação: </b>" + att.Situacao + "<br><b>Área: </b>" + att.Area + "<br><b>Perímetro: </b>" + att.Perimetro;
       layer.bindPopup(popupContent);
+      
+      // Adiciona o rótulo do lote usando um marcador com ícone customizado
+      var bounds = layer.getBounds();
+      var center = bounds.getCenter();
+      
+      // Define um ícone customizado (invisível) só para mostrar o texto
+      var customIcon = L.divIcon({
+        html: '<div class="lote-label-marker">' + att.Lote + '</div>',
+        iconSize: [0, 0],
+        className: 'lote-marker-container'
+      });
+      
+      var marker = L.marker(center, { icon: customIcon });
+      lotesLabelsGroup.addLayer(marker);
+      
       layer.on({
         mouseover: highlightFeature,
         mouseout: resetHighlight,
@@ -365,6 +403,25 @@
     }
 
     control_layers.addOverlay(lotes, "Lotes");
+
+    // Adiciona o grupo de rótulos ao mapa (inicialmente oculto)
+    if (mymap.getZoom() >= minZoomForLoteLabels) {
+      lotesLabelsGroup.addTo(mymap);
+    }
+
+    // Evento de zoom para controlar exibição dos rótulos dos lotes
+    mymap.on('zoomend', function() {
+      var currentZoom = mymap.getZoom();
+      if (currentZoom >= minZoomForLoteLabels) {
+        if (!mymap.hasLayer(lotesLabelsGroup)) {
+          mymap.addLayer(lotesLabelsGroup);
+        }
+      } else {
+        if (mymap.hasLayer(lotesLabelsGroup)) {
+          mymap.removeLayer(lotesLabelsGroup);
+        }
+      }
+    });
 
     //FUNÇÃO DE BUSCA DE LOTE
     $("#findBuilding").click(function () {
