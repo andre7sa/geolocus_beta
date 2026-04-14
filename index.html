@@ -357,7 +357,6 @@
     }
 
     control_layers.addOverlay(quadras, "Quadras");
-    quadras.bringToBack();
 
     // Adiciona o grupo de rótulos ao mapa (inicialmente oculto)
     if (mymap.getZoom() >= minZoomForquadraLabels) {
@@ -377,6 +376,7 @@
         }
       }
     });
+    quadras.bringToBack();
 
     //EQUIPAMENTOS
     var equipamentos = L.geoJson.ajax("data/GeoJSON/Equipamentos_Publicos.geojson", { style: style_equipamentos }).addTo(mymap);
