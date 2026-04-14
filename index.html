@@ -323,7 +323,7 @@
     var minZoomForquadraLabels = 16; // Zoom mínimo para exibir rótulos
     var maxZoomForquadraLabels = 18; // Zoom máximo para exibir rótulos
 
-    var quadras = L.geoJson.ajax("data/GeoJSON/quadras.geojson", { style: style_quadras, onEachFeature: process_quadras }).addTo(mymap);
+    var quadras = L.geoJson.ajax("data/GeoJSON/quadras.geojson", { style: style_quadras, onEachFeature: process_quadras });
 
     function style_quadras(json) {
       var style = {
@@ -376,7 +376,6 @@
         }
       }
     });
-    quadras.bringToBack();
 
     //EQUIPAMENTOS
     var equipamentos = L.geoJson.ajax("data/GeoJSON/Equipamentos_Publicos.geojson", { style: style_equipamentos }).addTo(mymap);
