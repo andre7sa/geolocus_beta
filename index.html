@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
   <meta charset="UTF-8" />
@@ -357,6 +357,7 @@
     }
 
     control_layers.addOverlay(quadras, "Quadras");
+    quadras.bringToBack();
 
     // Adiciona o grupo de rótulos ao mapa (inicialmente oculto)
     if (mymap.getZoom() >= minZoomForquadraLabels) {
