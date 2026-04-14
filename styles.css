@@ -1,3 +1,92 @@
 #mapdiv {
   height: 100vh;
 }
+
+.bold {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.errorMsg {
+  padding: 0;
+  text-align: center;
+  background-color: darksalmon;
+}
+
+.ui-autocomplete {
+  z-index: 9999 !important;
+  position: absolute;
+}
+
+#map {
+  width: 800px;
+  height: 500px;
+}
+
+.info {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
+.info h4 {
+  margin: 0 0 5px;
+  color: #777;
+}
+
+.legend {
+  text-align: left;
+  line-height: 18px;
+  color: #555;
+}
+
+.legend i {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.lote-marker-container {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.lote-label-marker {
+  font-weight: bold;
+  font-size: 13px;
+  color: #000;
+  text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8),
+    -1px -1px 3px rgba(255, 255, 255, 0.8),
+    1px -1px 3px rgba(255, 255, 255, 0.8),
+    -1px 1px 3px rgba(255, 255, 255, 0.8);
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.quadra-marker-container {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.quadra-label-marker {
+  font-weight: bold;
+  font-size: 14px;
+  color: #070a29;
+  text-shadow: 1px 2px 3px rgba(255, 255, 255, 0.90),
+    -1px -2px 3px rgba(255, 255, 255, 0.90),
+    1px -2px 3px rgba(255, 255, 255, 0.90),
+    -1px 2px 3px rgba(255, 255, 255, 0.90);
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
