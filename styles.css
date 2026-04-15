@@ -78,15 +78,89 @@
 }
 
 .quadra-label-marker {
+  /* 1. Tipografia e Cor */
   font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
   color: #070a29;
-  text-shadow: 1px 2px 3px rgba(255, 255, 255, 0.90),
-    -1px -2px 3px rgba(255, 255, 255, 0.90),
-    1px -2px 3px rgba(255, 255, 255, 0.90),
-    -1px 2px 3px rgba(255, 255, 255, 0.90);
+  
+  /* 2. O formato de Círculo */
+  background-color: rgba(255, 255, 255, 0.85); /* Fundo branco levemente transparente */
+  border: 2px solid #070a29; /* Borda da mesma cor da letra */
+  border-radius: 50%; /* O segredo para fazer um quadrado virar círculo perfeito */
+  
+  /* 3. Tamanho Fixo */
+  width: 25px;
+  height: 25px;
+  
+  /* 4. Alinhamento perfeito do texto no centro (Flexbox) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* 5. Efeito 3D e Posicionamento */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
   position: absolute;
   transform: translate(-50%, -50%);
-  white-space: nowrap;
-  pointer-events: none;
+  pointer-events: none; /* Garante que o mouse atravesse o rótulo para clicar no lote */
+}
+
+/* ==========================================================
+   ESTILIZAÇÃO MODERNA DO CONTROLE DE CAMADAS (LEAFLET + BS5)
+   ========================================================== */
+
+/* 1. A Caixa Principal (Fundo, Sombras e Bordas) */
+.leaflet-control-layers {
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+  background-color: rgba(255, 255, 255, 0.95) !important; /* Leve transparência */
+  padding: 5px 5px !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  backdrop-filter: blur(5px); /* Efeito de vidro moderno */
+}
+
+/* 2. As Linhas de cada Camada (Labels) */
+.leaflet-control-layers label {
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 10px !important;
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057; /* Cor de texto neutra do Bootstrap */
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+/* Efeito ao passar o mouse sobre o nome da camada */
+.leaflet-control-layers label:hover {
+  color: #0d6efd; /* Azul primário do Bootstrap */
+}
+
+/* Remover margem do último item para não sobrar espaço */
+.leaflet-control-layers label:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* 3. Checkboxes e Radio Buttons Modernizados */
+.leaflet-control-layers input[type="checkbox"],
+.leaflet-control-layers input[type="radio"] {
+  margin-right: 12px !important;
+  margin-top: 0 !important;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #0d6efd; /* Pinta a caixinha de azul quando selecionada */
+}
+
+/* 4. A Linha Divisória (Entre Satélite/Streets e Lotes/Quadras) */
+.leaflet-control-layers-separator {
+  border-top: 1px solid #dee2e6 !important; /* Linha cinza clara igual do BS5 */
+  margin: 12px 0 !important;
+}
+
+/* 5. O Ícone quando a caixinha está fechada (Mobile/Padrão) */
+.leaflet-control-layers-toggle {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
 }

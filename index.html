@@ -4,80 +4,79 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PortalGeo</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/2.0.0-alpha/leaflet.css" />
+  <title>PortalGeo - Geolocus Beta (BS5)</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
-  <link rel="stylesheet" href="source/jquery-ui.min.css" />
-  <link rel="stylesheet" href="plugins/sidebar/L.Control.Sidebar.css" />
+  <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.0/leaflet.css" />
   <link rel="stylesheet" href="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css" />
   <link rel="stylesheet" href="plugins/MousePosition/L.Control.MousePosition.css" />
   <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css" />
   <link rel="stylesheet" href="plugins/minimap/Control.MiniMap.min.css" />
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.0/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.0/leaflet-src.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="source/jquery-ui.min.js"></script>
-  <script src="plugins/sidebar/L.Control.Sidebar.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
   <script src="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
   <script src="plugins/MousePosition/L.Control.MousePosition.js"></script>
   <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.js"></script>
   <script src="plugins/minimap/Control.MiniMap.min.js"></script>
-  <script src="plugins/ajax/leaflet.ajax.js"></script>
-
 </head>
 
 <body>
 
-  <div id="sidebar" class="col-md-3">
+  <div class="offcanvas offcanvas-start shadow" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+    id="sidebar" aria-labelledby="sidebarLabel" style="width: 350px;">
 
-    <div id=" divValve class=" col-xs-12"></div>
-    <div class="col-xs-12" style="height: 10px;"></div>
-
-    <div class="col-xs-12">
-      <p class="text-center bold">Informações dos Lotes</p>
+    <div class="offcanvas-header border-bottom">
+      <h5 class="offcanvas-title fw-bold" id="sidebarLabel"><i
+          class="bi bi-geo-alt-fill me-2 text-primary"></i>Informações dos Lotes</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
 
-    <div class="col-xs-12 errorMsg" id="lote_error"></div>
-    <div class="col-xs-12" style="height: 10px;"></div>
+    <div class="offcanvas-body p-3">
+      <div id="lote_error"></div>
 
-    <div class="form-group">
-      <div class="col-xs-6">
-        <input type="text" id="lote_id" class="form-control" placeholder="01A">
-        <p class="text-muted" style="font-size: 12px;"><em>Exp.: 01A (Lote 01, Quadra A)</em></p>
+      <div class="row g-2 mt-2">
+        <div class="col-8">
+          <input type="text" id="lote_id" class="form-control" list="lotesList" placeholder="Ex: 01A">
+          <datalist id="lotesList"></datalist>
+          <div class="form-text mt-1" style="font-size: 11px;">
+            <em>Lote e Quadra (Ex: 01A)</em>
+          </div>
+        </div>
+        <div class="col-4">
+          <button id="findlote" class="btn btn-primary w-100">Buscar</button>
+        </div>
       </div>
-      <div class="col-xs-6">
-        <button id="findlote" class="btn btn-primary">Buscar Lote</button>
-      </div>
+
+<hr>
+<div id="lote_information">
+  <p class="text-muted text-center">Clique em um lote ou faça uma busca para ver os detalhes.</p>
+</div>
+
+<hr>
+<div class="mt-3">
+  <h6 class="fw-bold text-center mb-3">-------</h6>
+  <canvas id="graficoLotes" width="100" height="100"></canvas>
+</div>
     </div>
-
-    <div class="col-xs-12" id="lote_information">
-
-    </div>
-
   </div>
 
-  </div>
-
-  <div id="mapdiv" class="col-md-12"></div>
+  <div id="mapdiv" class="w-100" style="height: 100vh;"></div>
 
   <script>
-
-    // INITIALIZE MAP
-
-    var mymap;
-    var baseLayers;
-    var overlays;
-    var lyrSearch;
-
+    // --- CONFIGURAÇÃO INICIAL ---
+    var mymap, baseLayers, overlays = {}, lyrSearch, control_layers;
     var lotes_array = [];
+    var lotesLayer, quadrasLayer, equipamentosLayer, ruasLayer;
+    var lotesLabelsGroup = L.layerGroup(), quadraLabelsGroup = L.layerGroup();
 
+    var minZoomForLoteLabels = 19, minZoomForquadraLabels = 17, maxZoomForquadraLabels = 22;
 
+    // --- 1. NO MAP INITIALIZE (Adicione a criação dos Panes) ---
     mymap = L.map("mapdiv", {
       center: [-8.000449, -38.308012],
       zoom: 16,
@@ -85,79 +84,38 @@
       zoomControl: false,
     });
 
-    // DEFINE TILE LAYERS
-    var googleStreets = L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", { maxZoom: 23, subdomains: ["mt0", "mt1", "mt2", "mt3"] },);
-    var googleSat = L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", { maxZoom: 23, subdomains: ["mt0", "mt1", "mt2", "mt3"] },);
-    var openStreetMap = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png?", { maxZoom: 23 },);
-    var CartoDB_Voyager = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 23 },);
-    var Esri_WorldImagery = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 23 },);
-    var Esri_WorldImagery_minimap = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 23 },);
-    var Esri_WorldTopoMap = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", { maxZoom: 23 },);
-    var OpenTopoMap = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom: 23, },);
+    // Criando painéis customizados para garantir a ordem das camadas
+    mymap.createPane('quadrasPane');
+    mymap.getPane('quadrasPane').style.zIndex = 400; // Menor prioridade
+    mymap.getPane('quadrasPane').style.pointerEvents = 'none'; // Impede que a quadra intercepte o mouse
 
-    googleSat.addTo(mymap);
+    mymap.createPane('lotesPane');
+    mymap.getPane('lotesPane').style.zIndex = 450; // Maior prioridade que as quadras
 
-    //SIDEBAR
-    var sidebar = L.control.sidebar("sidebar", { position: "left", });
+    // --- CAMADAS DE MAPA ---
+    var googleStreets = L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", { maxZoom: 23, subdomains: ["mt0", "mt1", "mt2", "mt3"] });
+    var googleSat = L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", { maxZoom: 23, subdomains: ["mt0", "mt1", "mt2", "mt3"] }).addTo(mymap);
+    var openStreetMap = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png?", { maxZoom: 23 });
+    var CartoDB_Voyager = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 23 });
+    var Esri_WorldImagery = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 23 });
+    var Esri_WorldTopoMap = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", { maxZoom: 23 });
+    var OpenTopoMap = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom: 23 });
 
-    mymap.addControl(sidebar);
-    sidebar.hide();
+    // --- CONTROLES ---
+    // Instancia o Offcanvas do Bootstrap 5
+    var sidebarOffcanvas = new bootstrap.Offcanvas(document.getElementById('sidebar'));
 
-    //EASY BUTTON
-    L.easyButton("glyphicon glyphicon-search", function (btn, map) {
-      sidebar.toggle();
+    // O botão de busca no mapa agora abre o Offcanvas
+    L.easyButton("bi bi-search", function () {
+      sidebarOffcanvas.toggle();
     }).addTo(mymap);
 
-    //SCALE
-    L.control
-      .scale({
-        maxWidth: 200,
-        position: "bottomleft",
-        metric: true,
-        imperial: false,
-      })
-      .addTo(mymap);
-
-    //ZOOM CONTROL
-    L.control.zoom({ position: "topright", }).addTo(mymap);
-
-    //MEASURE TOOL
-    L.control
-      .polylineMeasure({
-        position: "topright",
-        unit: "kilometres",
-        showBearings: false,
-        clearMeasurementsOnStop: false,
-        showClearControl: true,
-        showUnitControl: true,
-        bearingTextIn: "In",
-        bearingTextOut: "Out",
-      })
-      .addTo(mymap);
-
-    //MOUSE POSITION
+    L.control.scale({ maxWidth: 200, position: "bottomleft", metric: true, imperial: false }).addTo(mymap);
+    L.control.zoom({ position: "topright" }).addTo(mymap);
     L.control.mousePosition({ position: "bottomright" }).addTo(mymap);
+    mymap.pm.addControls({ position: "topleft", drawCircleMarker: false, rotateMode: true });
 
-    //DRAW CONTROL OR GEOMAN CONTROL
-    mymap.pm.addControls({
-      position: "topleft",
-      drawCircleMarker: false,
-      rotateMode: true,
-    });
-
-    mymap.on("pm:create", function (e) {
-      console.log("e: " + e);
-    });
-
-    //MINIMAP
-    var miniMap = new L.Control.MiniMap(Esri_WorldImagery_minimap, {
-      position: "bottomright",
-      width: 150,
-      height: 150
-    }).addTo(mymap);
-
-    //LAYER CONTROL
-    baseLayers = {
+    var baseLayers = {
       "Google Streets": googleStreets,
       "Google Satellite": googleSat,
       "OpenStreetMap": openStreetMap,
@@ -166,288 +124,161 @@
       "Esri World Topo Map": Esri_WorldTopoMap,
       "OpenTopoMap": OpenTopoMap
     };
+    control_layers = L.control.layers(baseLayers, overlays, { position: "topright" }).addTo(mymap);
 
-    var control_layers = L.control.layers(baseLayers, overlays, { position: "topright" }).addTo(mymap);
+    // --- FUNÇÃO CENTRAL DE EXIBIÇÃO ---
+    function selecionarLote(att, layer) {
+      // 1. Formata o conteúdo (Quadra, Lote, Situação, Área e Perímetro)
+      const infoHTML = `
+        <div class="card border-0 bg-light">
+          <div class="card-body p-2">
+            <h6 class="card-title fw-bold text-primary mb-3">Detalhes do Imóvel</h6>
+            <p class="mb-1"><strong>Quadra:</strong> ${att.Quadra}</p>
+            <p class="mb-1"><strong>Lote:</strong> ${att.Lote}</p>
+            <p class="mb-1"><strong>Situação:</strong> <span class="badge ${att.Situacao === 'Vendido' ? 'bg-success' : 'bg-warning text-dark'}">${att.Situacao}</span></p>
+            <p class="mb-1"><strong>Área:</strong> ${att.Area || 'N/A'}</p>
+            <p class="mb-1"><strong>Perímetro:</strong> ${att.Perimetro || 'N/A'}</p>
+          </div>
+        </div>`;
 
-    //DATA LOADING
+      // 2. Atualiza Sidebar e Garante que esteja aberta
+      document.getElementById('lote_information').innerHTML = infoHTML;
+      document.getElementById('lote_error').innerHTML = '';
+      if (!document.getElementById('sidebar').classList.contains('show')) sidebarOffcanvas.show();
 
-    //LOTES
+      // 3. Zoom e Popup no Mapa
+      mymap.fitBounds(layer.getBounds(), { maxZoom: 21 });
+      layer.bindPopup(infoHTML).openPopup();
 
-    var lotesLabelsGroup = L.layerGroup(); // Cria um grupo para os rótulos
-    var minZoomForLoteLabels = 19; // Zoom mínimo para exibir rótulos
+      // 4. Destaque Visual (Selection Layer)
+      if (lyrSearch) lyrSearch.remove();
+      lyrSearch = L.geoJson(layer.toGeoJSON(), {
+        style: { color: '#333', weight: 5, fillOpacity: 0, dashArray: '5, 5' }
+      }).addTo(mymap);
+    }
 
-    var lotes = L.geoJson.ajax("data/GeoJSON/Lotes.geojson", { style: style_lotes, onEachFeature: process_lotes }).addTo(mymap);
+    // --- CARREGAMENTO DE DADOS (FETCH API) ---
+    // Quadras 
+    fetch("data/GeoJSON/quadras.geojson").then(res => res.json()).then(data => {
+      quadrasLayer = L.geoJSON(data, {
+        style: style_quadras,
+        onEachFeature: process_quadras,
+        pane: 'quadrasPane' // Vincula esta camada ao painel inferior
+      }).addTo(mymap);
+      control_layers.addOverlay(quadrasLayer, "Quadras");
+    });
 
-    lotes.on('data:loaded', function () {
-      mymap.fitBounds(lotes.getBounds());
-      $("#lote_id").autocomplete({
-        source: lotes_array,
-        minLength: 0
+    // Lotes (No painel superior)
+    fetch("data/GeoJSON/Lotes.geojson").then(res => res.json()).then(data => {
+      lotesLayer = L.geoJSON(data, {
+        style: style_lotes,
+        onEachFeature: function (json, layer) {
+          lotes_array.push(json.properties.lote_id);
+          // Labels
+          var marker = L.marker(layer.getBounds().getCenter(), {
+            icon: L.divIcon({ html: `<div class="lote-label-marker">${json.properties.Lote}</div>`, iconSize: [0, 0], className: 'lote-marker-container' })
+          });
+          lotesLabelsGroup.addLayer(marker);
+
+          // Eventos
+          layer.on({
+            mouseover: function (e) { e.target.setStyle({ weight: 4, color: '#3a3a3a' }); },
+            mouseout: function (e) { lotesLayer.resetStyle(e.target); },
+            click: function (e) { selecionarLote(e.target.feature.properties, e.target); }
+          });
+        },
+        pane: 'lotesPane'
+      }).addTo(mymap);
+
+      control_layers.addOverlay(lotesLayer, "Lotes");
+
+      // Popular Autocomplete
+      const datalist = document.getElementById('lotesList');
+      lotes_array.forEach(id => {
+        let opt = document.createElement('option'); opt.value = id; datalist.appendChild(opt);
       });
     });
 
-    console.log(lotes_array);
+    // Demais camadas
+    fetch("data/GeoJSON/Equipamentos_Publicos.geojson").then(res => res.json()).then(data => {
+      equipamentosLayer = L.geoJSON(data, { style: style_equipamentos }).addTo(mymap);
+      control_layers.addOverlay(equipamentosLayer, "Equipamentos");
+    });
+    fetch("data/GeoJSON/Ruas.geojson").then(res => res.json()).then(data => {
+      ruasLayer = L.geoJSON(data, { style: style_ruas }).addTo(mymap);
+      control_layers.addOverlay(ruasLayer, "Ruas");
+    });
+
+    // --- FUNÇÕES AUXILIARES ---
 
     function style_lotes(json) {
-      var att = json.properties;
-      var color;
-      var fillColor;
-      var fillOpacity = 0.7;
-      switch (att.Situacao) {
-        case 'Disponível ':
-          color = '#000000';
-          fillColor = '#ffffbf';
-          break;
-        case 'Em Negociação':
-          color = '#000000';
-          fillColor = '#fc8d59';
-          break;
-        case 'Vendido':
-          color = '#000000';
-          fillColor = '#99d594';
-          break;
-        default:
-          color = '#000000';
-          fillColor = '#b5b251';
-          break;
-      }
-
-      var styleL = {
-        color: color,
-        fillColor: fillColor,
-        weight: 1,
-        opacity: 1,
-        fillOpacity: fillOpacity,
-        dashArray: '0'
-      };
-
-      return styleL;
+      var s = json.properties.Situacao;
+      var color = (s === 'Vendido') ? '#99d594' : (s === 'Em Negociação') ? '#fc8d59' : '#ffffbf';
+      return { color: '#000', fillColor: color, weight: 1, opacity: 1, fillOpacity: 0.7 };
     }
 
     function process_lotes(json, layer) {
-      var att = json.properties;
-
-      lotes_array.push(att.lote_id)
-
-      var popupContent = "<b>Quadra: </b>" + att.Quadra +
-        "<br><b>Lote: </b>" + att.Lote +
-        "<br><b>Situação: </b>" + att.Situacao +
-        "<br><b>Área: </b>" + att.Area +
-        "<br><b>Perímetro: </b>" + att.Perimetro;
-
-      layer.bindPopup(popupContent);
-
-      // Adiciona o rótulo do lote usando um marcador com ícone customizado
-      var bounds = layer.getBounds();
-      var center = bounds.getCenter();
-
-      // Define um ícone customizado (invisível) só para mostrar o texto
-      var customIcon = L.divIcon({
-        html: '<div class="lote-label-marker">' + att.Lote + '</div>',
-        iconSize: [0, 0],
-        className: 'lote-marker-container'
+      lotes_array.push(json.properties.lote_id);
+      layer.bindPopup("<b>Lote: </b>" + json.properties.Lote);
+      var marker = L.marker(layer.getBounds().getCenter(), {
+        icon: L.divIcon({ html: '<div class="lote-label-marker">' + json.properties.Lote + '</div>', iconSize: [0, 0], className: 'lote-marker-container' })
       });
-
-      var marker = L.marker(center, { icon: customIcon });
       lotesLabelsGroup.addLayer(marker);
-
-      layer.on({
-        mouseover: highlightFeature,
-        mouseout: resetHighlight,
-        click: zoomToFeature
-      });
+      layer.on({ mouseover: highlightFeature, mouseout: resetHighlight, click: zoomToFeature });
     }
 
-    control_layers.addOverlay(lotes, "Lotes");
-
-    //FUNÇÃO DE BUSCA DOS LOTES
-    $("#findlote").click(function () {
-      var lote_id = $("#lote_id").val();
-      var lyr = returnLayerByAtribute(lotes, "lote_id", lote_id.toUpperCase());
-
-      if (lyr) {
-        var att = lyr.feature.properties;
-
-        if (lyrSearch) {
-          lyrSearch.remove();
-        }
-
-        lyrSearch = L.geoJson(lyr.toGeoJSON(), {
-          style: {
-            color: '#303030',
-            weight: 6,
-            opacity: 0.9,
-            fillOpacity: 0
-          }
-        }).addTo(mymap);
-
-        mymap.fitBounds(lyr.getBounds(), { maxZoom: 21 });
-        //lotes.bringToFront();
-
-        var popupContent = "<b>Quadra: </b>" + att.Quadra +
-          "<br><b>Lote: </b>" + att.Lote +
-          "<br><b>Situação: </b>" + att.Situacao +
-          "<br><b>Área: </b>" + att.Area +
-          "<br><b>Perímetro: </b>" + att.Perimetro;
-
-        lyrSearch.bindPopup(popupContent); //permitir o balão com as informações, mesmo com o stylo de seleção sobreposto.
-
-        $("#lote_information").html(popupContent);
-
-      } else {
-        $("#lote_error").html("Lote não encontrada. Verifique o ID e tente novamente.");
-      }
-    });
-
-    // Adiciona o grupo de rótulos ao mapa (inicialmente oculto)
-    if (mymap.getZoom() >= minZoomForLoteLabels) {
-      lotesLabelsGroup.addTo(mymap);
-    }
-
-    // Evento de zoom para controlar exibição dos rótulos dos lotes
-    mymap.on('zoomend', function () {
-      var currentZoom = mymap.getZoom();
-      if (currentZoom >= minZoomForLoteLabels) {
-        if (!mymap.hasLayer(lotesLabelsGroup)) {
-          mymap.addLayer(lotesLabelsGroup);
-        }
-      } else {
-        if (mymap.hasLayer(lotesLabelsGroup)) {
-          mymap.removeLayer(lotesLabelsGroup);
-        }
-      }
-    });
-
-    //QUADRAS
-    var quadraLabelsGroup = L.layerGroup(); // Cria um grupo para os rótulos
-    var minZoomForquadraLabels = 16; // Zoom mínimo para exibir rótulos
-    var maxZoomForquadraLabels = 18; // Zoom máximo para exibir rótulos
-
-    var quadras = L.geoJson.ajax("data/GeoJSON/quadras.geojson", { style: style_quadras, onEachFeature: process_quadras });
-
-    function style_quadras(json) {
-      var style = {
-        color: "black",
-        fillColor: "green",
-        weight: 0.5,
-        opacity: 1,
-        fillOpacity: 0,
-        dashArray: '0'
-      };
-      return style;
-    }
+    function style_quadras(json) { return { color: "black", weight: 0.5, fillOpacity: 0 }; }
 
     function process_quadras(json, layer) {
-      var att = json.properties;
-
-      // Adiciona o rótulo do quadra usando um marcador com ícone customizado
-      var bounds = layer.getBounds();
-      var center = bounds.getCenter();
-
-      // Define um ícone customizado (invisível) só para mostrar o texto
-      var customIcon = L.divIcon({
-        html: '<div class="quadra-label-marker">' + att.Quadra + '</div>',
-        iconSize: [2, 2],
-        className: 'quadra-marker-container'
+      var marker = L.marker(layer.getBounds().getCenter(), {
+        icon: L.divIcon({ html: '<div class="quadra-label-marker">' + json.properties.Quadra + '</div>', iconSize: [0, 0], className: 'quadra-marker-container' })
       });
-
-      var marker = L.marker(center, { icon: customIcon });
       quadraLabelsGroup.addLayer(marker);
-
     }
 
-    control_layers.addOverlay(quadras, "Quadras");
+    function style_equipamentos() { return { color: "black", fillColor: "green", weight: 1, fillOpacity: 0.7 }; }
+    function style_ruas() { return { color: "black", fillColor: "gray", weight: 1, fillOpacity: 0.8 }; }
 
-    // Adiciona o grupo de rótulos ao mapa (inicialmente oculto)
-    if (mymap.getZoom() >= minZoomForquadraLabels) {
-      quadraLabelsGroup.addTo(mymap);
+    // --- GESTÃO DE RÓTULOS ---
+    function updateLabels() {
+      var zoom = mymap.getZoom();
+      if (lotesLayer && mymap.hasLayer(lotesLayer) && zoom >= minZoomForLoteLabels) {
+        if (!mymap.hasLayer(lotesLabelsGroup)) mymap.addLayer(lotesLabelsGroup);
+      } else { mymap.removeLayer(lotesLabelsGroup); }
+
+      if (quadrasLayer && mymap.hasLayer(quadrasLayer) && zoom >= minZoomForquadraLabels && zoom <= maxZoomForquadraLabels) {
+        if (!mymap.hasLayer(quadraLabelsGroup)) mymap.addLayer(quadraLabelsGroup);
+      } else { mymap.removeLayer(quadraLabelsGroup); }
     }
+    mymap.on('zoomend overlayadd overlayremove', updateLabels);
 
-    // Evento de zoom para controlar exibição dos rótulos dos lotes
-    mymap.on('zoomend', function () {
-      var currentZoom = mymap.getZoom();
-      if (currentZoom >= minZoomForquadraLabels && currentZoom <= maxZoomForquadraLabels) {
-        if (!mymap.hasLayer(quadraLabelsGroup)) {
-          mymap.addLayer(quadraLabelsGroup);
-        }
+    // --- BUSCA ---
+    // --- NOVA FUNÇÃO DE BUSCA (VANILLA JS) ---
+    document.getElementById('findlote').addEventListener('click', function () {
+      const id = document.getElementById('lote_id').value.toUpperCase();
+      let foundLayer = false;
+      lotesLayer.eachLayer(l => { if (l.feature.properties.lote_id === id) foundLayer = l; });
+
+      if (foundLayer) {
+        selecionarLote(foundLayer.feature.properties, foundLayer);
       } else {
-        if (mymap.hasLayer(quadraLabelsGroup)) {
-          mymap.removeLayer(quadraLabelsGroup);
-        }
+        document.getElementById('lote_error').innerHTML = '<div class="alert alert-danger p-2 small">Lote não encontrado.</div>';
       }
     });
 
-    //EQUIPAMENTOS
-    var equipamentos = L.geoJson.ajax("data/GeoJSON/Equipamentos_Publicos.geojson", { style: style_equipamentos }).addTo(mymap);
-
-    function style_equipamentos(json) {
-      var style = {
-        color: "black",
-        fillColor: "green",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.7,
-        dashArray: '0'
-      };
-      return style;
+    function style_lotes(json) {
+      const s = json.properties.Situacao;
+      const color = (s === 'Vendido') ? '#99d594' : (s === 'Em Negociação' ? '#fc8d59' : '#ffffbf');
+      return { color: '#000', fillColor: color, weight: 1, fillOpacity: 0.7 };
     }
 
-    control_layers.addOverlay(equipamentos, "Equipamentos públicos");
-
-    //RUAS
-    var ruas = L.geoJson.ajax("data/GeoJSON/Ruas.geojson", { style: style_ruas }).addTo(mymap);
-
-    function style_ruas(json) {
-      var style = {
-        color: "black",
-        fillColor: "gray",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8,
-        dashArray: '0'
-      };
-      return style;
-    }
-
-    control_layers.addOverlay(ruas, "Ruas");
-
-    //GENERAL FUNCION TO FIND LAYER BY ATTRIBUTE
-    function returnLayerByAtribute(layer, attribute_name, attribute_value) {
-
-      var all_layers = layer.getLayers();
-
-      for (var i = 0; i < all_layers.length; i++) {
-        var retained_value = all_layers[i].feature.properties[attribute_name];
-
-        if (retained_value == attribute_value) {
-          return all_layers[i];
-        }
-      }
-      return false;
-    }
-
-    //FUNÇÕES DE INTERAÇÃO COM OS LOTES
-    function highlightFeature(e) {
-      var layer = e.target;
-
-      layer.setStyle({
-        weight: 8,
-        color: '#303030',
-        dashArray: '',
-        fillOpacity: 0.7
-      });
-
-      layer.bringToFront();
-    }
-
-    function resetHighlight(e) {
-      lotes.resetStyle(e.target);
-    }
-
-    function zoomToFeature(e) {
-      mymap.fitBounds(e.target.getBounds(), { maxZoom: 21 });
-    }
-
+    // Gestão de Rótulos por Zoom
+    mymap.on('zoomend overlayadd overlayremove', function () {
+      const zoom = mymap.getZoom();
+      if (lotesLayer && mymap.hasLayer(lotesLayer) && zoom >= minZoomForLoteLabels) {
+        if (!mymap.hasLayer(lotesLabelsGroup)) mymap.addLayer(lotesLabelsGroup);
+      } else { mymap.removeLayer(lotesLabelsGroup); }
+    });
   </script>
 </body>
 
